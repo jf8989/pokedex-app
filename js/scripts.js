@@ -19,3 +19,17 @@ let pokemonList = [
         types: ["water"]
     }
 ];
+
+// Iterate over each Pokémon in the list
+for (let i = 0; i < pokemonList.length; i++) {
+    let pokemon = pokemonList[i];
+    let displayText = `<p>${pokemon.name} (height: ${pokemon.height})`;
+
+    // Highlight special Pokémon with height above 1.0
+    if (pokemon.height > 1.0) {
+        displayText += " - Wow, that’s big!";
+    }
+
+    displayText += "</p>";
+    document.write(displayText);
+}
