@@ -86,17 +86,19 @@ let pokemonList = [
 ];
 
 // Iterate over each Pokémon in the list
+document.write('<ul class="pokemon-list">');
 for (let i = 0; i < pokemonList.length; i++) {
     let pokemon = pokemonList[i];
-    let displayText = `<p>${pokemon.name} (height: ${pokemon.height})`;
+    let displayText = `<li>${pokemon.name} (height: ${pokemon.height}`;
 
     // Highlight special Pokémon with height above 1.0
     if (pokemon.height > 1.0) {
-        displayText += " - Wow, that’s big!";
+        displayText += `) - <span class="big">Wow, that’s big!</span>`;
     } else {
-        displayText += " - Hey there, little guy!";
+        displayText += `) - <span class="small">That's a small one.</span>`;
     }
 
-    displayText += "</p>";
+    displayText += `</li>`;
     document.write(displayText);
 }
+document.write('</ul>');
