@@ -1,104 +1,195 @@
-// Array to hold Pokémon data
-let pokemonList = [
-    // First Pokémon object
+// IIFE to create a Pokémon repository
+let pokemonRepository = (function () {
+  let pokemonList = [
     {
-        name: "Bulbasaur",
-        height: 7,
-        types: ["grass", "poison"]
-    },
-    // Second Pokémon object
-    {
-        name: "Charmander",
-        height: 6,
-        types: ["fire"]
-    },
-    // Third Pokémon object
-    {
-        name: "Squirtle",
-        height: 5,
-        types: ["water"]
+      name: "Bulbasaur",
+      height: 7,
+      types: ["grass", "poison"],
     },
     {
-        name: "Charizard",
-        height: 1.7,
-        types: ["fire", "flying"]
+      name: "Charmander",
+      height: 6,
+      types: ["fire"],
     },
     {
-        name: "Pikachu",
-        height: 0.4,
-        types: ["electric"]
+      name: "Squirtle",
+      height: 5,
+      types: ["water"],
     },
     {
-        name: "Jigglypuff",
-        height: 0.5,
-        types: ["fairy", "normal"]
+      name: "Charizard",
+      height: 1.7,
+      types: ["fire", "flying"],
     },
     {
-        name: "Gengar",
-        height: 1.5,
-        types: ["ghost", "poison"]
+      name: "Pikachu",
+      height: 0.4,
+      types: ["electric"],
     },
     {
-        name: "Eevee",
-        height: 0.3,
-        types: ["normal"]
+      name: "Jigglypuff",
+      height: 0.5,
+      types: ["fairy", "normal"],
     },
     {
-        name: "Snorlax",
-        height: 2.1,
-        types: ["normal"]
+      name: "Gengar",
+      height: 1.5,
+      types: ["ghost", "poison"],
     },
     {
-        name: "Mewtwo",
-        height: 2.0,
-        types: ["psychic"]
+      name: "Eevee",
+      height: 0.3,
+      types: ["normal"],
     },
     {
-        name: "Lucario",
-        height: 1.2,
-        types: ["fighting", "steel"]
+      name: "Snorlax",
+      height: 2.1,
+      types: ["normal"],
     },
     {
-        name: "Greninja",
-        height: 1.5,
-        types: ["water", "dark"]
+      name: "Mewtwo",
+      height: 2.0,
+      types: ["psychic"],
     },
     {
-        name: "Dragonite",
-        height: 2.2,
-        types: ["dragon", "flying"]
+      name: "Lucario",
+      height: 1.2,
+      types: ["fighting", "steel"],
     },
     {
-        name: "Gyarados",
-        height: 6.5,
-        types: ["water", "flying"]
+      name: "Greninja",
+      height: 1.5,
+      types: ["water", "dark"],
     },
     {
-        name: "Lapras",
-        height: 2.5,
-        types: ["water", "ice"]
+      name: "Dragonite",
+      height: 2.2,
+      types: ["dragon", "flying"],
     },
     {
-        name: "Arcanine",
-        height: 1.9,
-        types: ["fire"]
-    }
-];
+      name: "Gyarados",
+      height: 6.5,
+      types: ["water", "flying"],
+    },
+    {
+      name: "Lapras",
+      height: 2.5,
+      types: ["water", "ice"],
+    },
+    {
+      name: "Arcanine",
+      height: 1.9,
+      types: ["fire"],
+    },
+  ];
 
-// Iterate over each Pokémon in the list
-document.write('<ul class="pokemon-list">');
-for (let i = 0; i < pokemonList.length; i++) {
-    let pokemon = pokemonList[i];
-    let displayText = `<li>${pokemon.name} (height: ${pokemon.height}`;
+  // Function to return all Pokémon
+  function getAll() {
+    return pokemonList;
+  }
 
-    // Highlight special Pokémon with height above 1.0
-    if (pokemon.height > 1.0) {
-        displayText += `) - <span class="big">Wow, that’s big!</span>`;
+  // Function to add a new Pokémon
+  function add(pokemon) {
+    if (
+      typeof pokemon === "object" &&
+      pokemon.hasOwnProperty("name") &&
+      pokemon.hasOwnProperty("height") &&
+      pokemon.hasOwnProperty("types")
+    ) {
+      pokemonList.push(pokemon);
+      renderList(); // Update the list after adding a new Pokémon
     } else {
-        displayText += `) - <span class="small">That's a small one.</span>`;
+      console.log("Invalid Pokémon data");
     }
+  }
 
-    displayText += `</li>`;
-    document.write(displayText);
-}
-document.write('</ul>');
+  // Function to find a Pokémon by name
+  function findByName(name) {
+    return pokemonList.filter(
+      (pokemon) => pokemon.name.toLowerCase() === name.toLowerCase()
+    );
+  }
+
+  // Function to find a Pokémon by name
+  function findByName(name) {
+    return pokemonList.filter(
+      (pokemon) => pokemon.name.toLowerCase() === name.toLowerCase()
+    );
+  }
+
+  // Function to render the Pokémon list
+  function renderList() {
+    // Clear the current list
+    document.querySelector(".pokemon-list").innerHTML = "";
+
+    // Group Pokémon by type
+    let groupedPokemon = {};
+    pokemonList.forEach((pokemon) => {
+      pokemon.types.forEach((type) => {
+        if (!groupedPokemon[type]) {
+          groupedPokemon[type] = [];
+        }
+        groupedPokemon[type].push(pokemon);
+      });
+    });
+
+    // Sort each group by height, tallest to shortest
+    Object.keys(groupedPokemon).forEach((type) => {
+      groupedPokemon[type].sort((a, b) => b.height - a.height);
+    });
+
+    // Render the grouped and sorted Pokémon
+    Object.keys(groupedPokemon).forEach((type) => {
+      let typeHeader = `<h2>${
+        type.charAt(0).toUpperCase() + type.slice(1)
+      }</h2>`;
+      document
+        .querySelector(".pokemon-list")
+        .insertAdjacentHTML("beforeend", typeHeader);
+
+      groupedPokemon[type].forEach((pokemon) => {
+        let typeClass = type; // Use only the current type for class
+
+        let displayText = `<li class="${typeClass}">`;
+        displayText += `${pokemon.name} (height: ${pokemon.height}`;
+
+        // Highlight special Pokémon with height above 1.0
+        if (pokemon.height > 1.0) {
+          displayText += `) - <span class="big">Wow, that’s big!</span>`;
+        } else {
+          displayText += `) - <span class="small">That's a small one.</span>`;
+        }
+
+        displayText += `</li>`;
+        document
+          .querySelector(".pokemon-list")
+          .insertAdjacentHTML("beforeend", displayText);
+      });
+    });
+  }
+
+  return {
+    getAll: getAll,
+    add: add,
+    findByName: findByName,
+    renderList: renderList,
+  };
+})();
+
+// Create the initial list container
+document.write('<ul class="pokemon-list"></ul>');
+
+// Initial rendering of the list
+pokemonRepository.renderList();
+
+// ***ACTIONS***
+
+// Adding a new Pokémon
+pokemonRepository.add({
+    name: "Mew",
+    height: 0.4,
+    types: ["psychic"]
+});
+
+// Finding a Pokémon by name (check in console)
+console.log(pokemonRepository.findByName('Mew'));
