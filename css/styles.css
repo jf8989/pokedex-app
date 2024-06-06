@@ -38,6 +38,10 @@ h1 {
     margin: 0 auto; /* Center the list */
 }
 
+.pokemon-list h2 {
+    margin-top: 40px; /* Add space below each header */
+}
+
 .pokemon-list li {
     background: #fff;
     color: #252222; /* Set to white for better contrast */
@@ -84,8 +88,8 @@ h1 {
 }
 
 .pokemon-list li.psychic {
-    background-color: #ffb6c1; /* Light pink for psychic type */
-    border: 2px solid #db7093; /* Stronger pink for border */
+    background-color: #8392de; /* Light pink for psychic type */
+    border: 2px solid #4860d8; /* Stronger pink for border */
 }
 
 .pokemon-list li.fighting {
@@ -123,10 +127,6 @@ h1 {
     border-width: 3px; /* Thicker border for taller Pokémon */
 }
 
-.pokemon-list li:nth-child(odd) {
-    background: #ffefd5;
-}
-
 .pokemon-list li span {
     font-weight: bold;
     color: #ff4500;
@@ -139,6 +139,10 @@ h1 {
 
 .pokemon-list li .small {
     color: #4682b4;
+}
+
+.pokemon-list li:last-child {
+    margin-bottom: 40px; /* Adjust this value to control the space */
 }
 
 /* Responsive Design */
