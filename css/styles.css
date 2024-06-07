@@ -1,8 +1,36 @@
 /* styles.css */
 
+/* Responsive Design */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .pokemon-list li {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 400px) {
+    h1 {
+        font-size: 1.2rem;
+    }
+
+    .pokemon-list li {
+        font-size: 0.8rem;
+        padding: 6px;
+    }
+}
+
 /* General styles */
 body {
     font-family: Arial, sans-serif;
+    font-size: 22px;
     background: rgba(0, 0, 0, 0.5); /* Fallback color with transparency */
     color: #ffffff; /* Set to white for better contrast */
     text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.5); /* Add text shadow for contrast */
@@ -27,7 +55,8 @@ body::before {
 
 h1 {
     text-align: center;
-    color: #ff4500; /* Adjust to a more vibrant red */
+    color: #ff4500;
+    font-size: 42px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add text shadow for contrast */
 }
 
@@ -44,8 +73,8 @@ h1 {
 
 .pokemon-list li {
     background: #fff;
-    color: #252222; /* Set to white for better contrast */
-    border: 2px solid #ff6347;
+    color: #252222;
+    border: px solid #ff6347;
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 10px;
@@ -58,6 +87,26 @@ h1 {
 /* Hover effect */
 .pokemon-list li:hover {
     transform: translateY(-10px); /* Move up by 10px */
+}
+
+.pokemon-list li button {
+    background-color: #f8f8f8;
+    border: none;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+    /* Optional: add rounded corners */
+    padding: 10px 24px;
+    /* Adjust padding as needed */
+    text-align: center;
+    /* Center the text */
+    transition: transform 0.3s ease;
+    /* Add transition for smooth movement */
 }
 
 /* Background colors and border colors for types */
@@ -143,31 +192,4 @@ h1 {
 
 .pokemon-list li:last-child {
     margin-bottom: 40px; /* Adjust this value to control the space */
-}
-
-/* Responsive Design */
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-
-    h1 {
-        font-size: 1.5rem;
-    }
-
-    .pokemon-list li {
-        font-size: 0.9rem;
-        padding: 8px;
-    }
-}
-
-@media (max-width: 400px) {
-    h1 {
-        font-size: 1.2rem;
-    }
-
-    .pokemon-list li {
-        font-size: 0.8rem;
-        padding: 6px;
-    }
 }

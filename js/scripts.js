@@ -76,24 +76,40 @@ let pokemonRepository = (function () {
         .insertAdjacentHTML("beforeend", typeHeader);
 
       groupedPokemon[type].forEach((pokemon) => {
-        let typeClass = type; // Use only the current type for class
-
-        let displayText = `<li class="${typeClass}">`;
-        displayText += `${pokemon.name} (height: ${pokemon.height}`;
-
-        // Highlight special Pokémon with height above 1.0
-        if (pokemon.height > 1.0) {
-          displayText += `) - <span class="big">Wow, that’s big!</span>`;
-        } else {
-          displayText += `) - <span class="small">That's a small one.</span>`;
-        }
-
-        displayText += `</li>`;
-        document
-          .querySelector(".pokemon-list")
-          .insertAdjacentHTML("beforeend", displayText);
+        addListItem(pokemon);
       });
     });
+  }
+
+  // Function to create list item for each Pokémon
+  function addListItem(pokemon) {
+    let ul = document.querySelector(".pokemon-list");
+    let li = document.createElement("li");
+    li.classList.add(pokemon.types[0]); // Use the first type as class
+
+    let displayText = `${pokemon.name} (height: ${pokemon.height})`;
+
+    // Highlight special Pokémon with height above 1.0
+    if (pokemon.height > 1.0) {
+      displayText += ` - <span class="big">Wow, that’s big!</span>`;
+    } else {
+      displayText += ` - <span class="small">That's a small one.</span>`;
+    }
+
+    let button = document.createElement("button");
+    button.innerHTML = displayText;
+    button.classList.add("pokemon-button");
+    button.addEventListener("click", () => {
+      showDetails(pokemon);
+    });
+
+    li.appendChild(button);
+    ul.appendChild(li);
+  }
+
+  // Function to show details of a Pokémon
+  function showDetails(pokemon) {
+    console.log(pokemon);
   }
 
   return {
@@ -105,7 +121,7 @@ let pokemonRepository = (function () {
 })();
 
 // Create the initial list container
-document.write('<ul class="pokemon-list"></ul>');
+document.querySelector("#pokemon-container").innerHTML = '<ul class="pokemon-list"></ul>';
 
 // Initial rendering of the list
 pokemonRepository.renderList();
