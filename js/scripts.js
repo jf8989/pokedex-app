@@ -1,23 +1,6 @@
 // IIFE to create a Pokémon repository
 let pokemonRepository = (function () {
-  let pokemonList = [
-    {name: "Bulbasaur", height: 7, types: ["grass", "poison"]},
-    {name: "Charmander", height: 6, types: ["fire"]},
-    {name: "Squirtle", height: 5, types: ["water"]},
-    {name: "Charizard", height: 1.7, types: ["fire", "flying"]},
-    {name: "Pikachu", height: 0.4, types: ["electric"]},
-    {name: "Jigglypuff", height: 0.5, types: ["fairy", "normal"]},
-    {name: "Gengar", height: 1.5, types: ["ghost", "poison"]},
-    {name: "Eevee", height: 0.3, types: ["normal"]},
-    {name: "Snorlax", height: 2.1, types: ["normal"]},
-    {name: "Mewtwo", height: 2.0, types: ["psychic"]},
-    {name: "Lucario", height: 1.2, types: ["fighting", "steel"]},
-    {name: "Greninja", height: 1.5, types: ["water", "dark"]},
-    {name: "Dragonite", height: 2.2, types: ["dragon", "flying"]},
-    {name: "Gyarados", height: 6.5, types: ["water", "flying"]},
-    {name: "Lapras", height: 2.5, types: ["water", "ice"]},
-    {name: "Arcanine", height: 1.9, types: ["fire"]},
-  ];
+  let pokemonList = [];
 
   // Function to return all Pokémon
   function getAll() {
@@ -28,14 +11,13 @@ let pokemonRepository = (function () {
   function add(pokemon) {
     if (
       typeof pokemon === "object" &&
-      pokemon.hasOwnProperty("name") &&
-      pokemon.hasOwnProperty("height") &&
-      pokemon.hasOwnProperty("types")
+      "name" in pokemon &&
+      "detailsUrl" in pokemon
     ) {
       pokemonList.push(pokemon);
-      renderList(); // Update the list after adding a new Pokémon
+      console.log("Added: ", pokemon); // Check if Pokémon are added
     } else {
-      console.log("Invalid Pokémon data");
+      console.error("Invalid Pokémon data", pokemon);
     }
   }
 
@@ -48,36 +30,11 @@ let pokemonRepository = (function () {
 
   // Function to render the Pokémon list
   function renderList() {
-    // Clear the current list
-    document.querySelector(".pokemon-list").innerHTML = "";
+    document.querySelector(".pokemon-list").innerHTML = ""; // Clear the current list
 
-    // Group Pokémon by first type
-    let groupedPokemon = {};
+    // Simply add each Pokémon to the list without grouping
     pokemonList.forEach((pokemon) => {
-      let firstType = pokemon.types[0]; // Use only the first type
-      if (!groupedPokemon[firstType]) {
-        groupedPokemon[firstType] = [];
-      }
-      groupedPokemon[firstType].push(pokemon);
-    });
-
-    // Sort each group by height, tallest to shortest
-    Object.keys(groupedPokemon).forEach((type) => {
-      groupedPokemon[type].sort((a, b) => b.height - a.height);
-    });
-
-    // Render the grouped and sorted Pokémon
-    Object.keys(groupedPokemon).forEach((type) => {
-      let typeHeader = `<h2>${
-        type.charAt(0).toUpperCase() + type.slice(1)
-      }</h2>`;
-      document
-        .querySelector(".pokemon-list")
-        .insertAdjacentHTML("beforeend", typeHeader);
-
-      groupedPokemon[type].forEach((pokemon) => {
-        addListItem(pokemon);
-      });
+      addListItem(pokemon);
     });
   }
 
@@ -85,11 +42,9 @@ let pokemonRepository = (function () {
   function addListItem(pokemon) {
     let ul = document.querySelector(".pokemon-list");
     let li = document.createElement("li");
-    li.classList.add(pokemon.types[0]); // Use the first type as class
 
-    let displayText = `${pokemon.name} (height: ${pokemon.height})`;
-
-    // Highlight special Pokémon with height above 1.0
+    let typesText = pokemon.types.join(", "); // Join all types with a comma
+    let displayText = `${pokemon.name} (Height: ${pokemon.height}, Types: ${typesText})`;
     if (pokemon.height > 1.0) {
       displayText += ` - <span class="big">Wow, that’s big!</span>`;
     } else {
@@ -107,21 +62,76 @@ let pokemonRepository = (function () {
     ul.appendChild(li);
   }
 
-  // Function to show details of a Pokémon
+  // Updated showDetails function to fetch details from API
   function showDetails(pokemon) {
-    console.log(pokemon);
+    loadDetails(pokemon).then(() => {
+      console.log(pokemon); // Now this logs all details including fetched ones
+    });
   }
 
+  // Function to load the list of Pokémon from the API
+  function loadList() {
+    showLoadingMessage(); // Show loading message at the start
+    return fetch("https://pokeapi.co/api/v2/pokemon/")
+      .then((response) => response.json())
+      .then((json) => {
+        console.log(json); // Add this line to check what the API returns
+        json.results.forEach((item) => {
+          let pokemon = {
+            name: item.name,
+            detailsUrl: item.url,
+          };
+          add(pokemon);
+        });
+        hideLoadingMessage(); // Hide loading message once data is loaded
+      })
+      .catch((e) => console.error(e));
+  }
+
+  // Function to load detailed data for a given Pokémon
+  function loadDetails(pokemon) {
+    showLoadingMessage(); // Show loading message at the start
+    let url = pokemon.detailsUrl;
+    return fetch(url)
+      .then((response) => response.json())
+      .then((details) => {
+        pokemon.height = details.height; // Continue fetching height
+        pokemon.types = details.types.map((t) => t.type.name); // Fetch and store types
+        pokemon.imageUrl = details.sprites.front_default; // Continue fetching image URL
+        hideLoadingMessage(); // Hide loading message once data is loaded
+      })
+      .catch((e) => console.error(e));
+  }
+
+  // Utility functions:
+  function showLoadingMessage() {
+    const loadingMessage = document.createElement("div");
+    loadingMessage.innerText = "Loading Pokémon data...";
+    loadingMessage.id = "loading-message";
+    document.body.appendChild(loadingMessage);
+  }
+
+  function hideLoadingMessage() {
+    const loadingMessage = document.getElementById("loading-message");
+    if (loadingMessage) {
+      loadingMessage.parentNode.removeChild(loadingUserListMessage);
+    }
+  }
+
+  // Expose these new methods via the repository's public interface
   return {
     getAll: getAll,
     add: add,
     findByName: findByName,
     renderList: renderList,
+    loadList: loadList, // Make sure to expose loadList
+    loadDetails: loadDetails, // And loadDetails
   };
 })();
 
 // Create the initial list container
-document.querySelector("#pokemon-container").innerHTML = '<ul class="pokemon-list"></ul>';
+document.querySelector("#pokemon-container").innerHTML =
+  '<ul class="pokemon-list"></ul>';
 
 // Initial rendering of the list
 pokemonRepository.renderList();
@@ -130,10 +140,27 @@ pokemonRepository.renderList();
 
 // Adding a new Pokémon
 pokemonRepository.add({
-    name: "Mew",
-    height: 0.4,
-    types: ["psychic"]
+  name: "Mew",
+  height: 0.4,
+  types: ["psychic"],
 });
 
 // Finding a Pokémon by name (check in console)
-console.log(pokemonRepository.findByName('Mew'));
+console.log(pokemonRepository.findByName("Mew"));
+
+document.addEventListener("DOMContentLoaded", function () {
+  pokemonRepository.loadList().then(() => {
+    // Fetch details for all Pokémon before rendering
+    let detailsPromises = pokemonRepository
+      .getAll()
+      .map((pokemon) => pokemonRepository.loadDetails(pokemon));
+    Promise.all(detailsPromises)
+      .then(() => {
+        // Render the list only after all details are fetched
+        pokemonRepository.renderList();
+      })
+      .catch((e) => {
+        console.error("Error fetching details:", e);
+      });
+  });
+});
