@@ -2,6 +2,8 @@
 let pokemonRepository = (function () {
   let pokemonList = [];
 
+  // *** DATA MANAGEMENT ***
+
   // Function to return all Pokémon
   function getAll() {
     return pokemonList;
@@ -28,11 +30,12 @@ let pokemonRepository = (function () {
     );
   }
 
+  // *** DOM RENDERING ***
+
   // Function to render the Pokémon list
   function renderList() {
-    document.querySelector(".pokemon-list").innerHTML = ""; // Clear the current list
-
-    // Simply add each Pokémon to the list without grouping
+    const pokemonListElement = document.querySelector(".pokemon-list");
+    pokemonListElement.innerHTML = ""; // Clear the current list
     pokemonList.forEach((pokemon) => {
       addListItem(pokemon);
     });
@@ -44,7 +47,10 @@ let pokemonRepository = (function () {
     let li = document.createElement("li");
 
     let typesText = pokemon.types.join(", "); // Join all types with a comma
-    let displayText = `${pokemon.name} (Height: ${pokemon.height}, Types: ${typesText})`;
+    // Use the capitalizeFirstLetter function for pokemon.name
+    let displayText = `${capitalizeFirstLetter(pokemon.name)} (Height: ${
+      pokemon.height
+    }, Types: ${typesText})`;
     if (pokemon.height > 1.0) {
       displayText += ` - <span class="big">Wow, that’s big!</span>`;
     } else {
@@ -62,12 +68,7 @@ let pokemonRepository = (function () {
     ul.appendChild(li);
   }
 
-  // Updated showDetails function to fetch details from API
-  function showDetails(pokemon) {
-    loadDetails(pokemon).then(() => {
-      console.log(pokemon); // Now this logs all details including fetched ones
-    });
-  }
+  // *** API INTERACTIONS ***
 
   // Function to load the list of Pokémon from the API
   function loadList() {
@@ -103,7 +104,62 @@ let pokemonRepository = (function () {
       .catch((e) => console.error(e));
   }
 
-  // Utility functions:
+  // Function to show detailed Pokémon information
+  function showDetails(pokemon) {
+    loadDetails(pokemon).then(() => {
+      showModal(pokemon);
+    });
+  }
+
+  // *** UTILITY FUNCTIONS ***
+
+  // Helper function to capitalize the first letter of a string
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  // Function to open the modal with Pokémon details
+  function showModal(pokemon) {
+    let modalContainer = document.querySelector("#pokemonModal");
+    let modalContent = modalContainer.querySelector(".modal-content");
+    let closeButton = modalContent.querySelector(".close");
+    let pokemonName = modalContent.querySelector("#pokemonName");
+    let pokemonHeight = modalContent.querySelector("#pokemonHeight");
+    let pokemonImage = modalContent.querySelector("#pokemonImage");
+
+    // Set the content
+    pokemonName.innerText = pokemon.name;
+    pokemonHeight.innerText = `Height: ${pokemon.height}`;
+    pokemonImage.src = pokemon.imageUrl;
+
+    // Show the modal
+    modalContainer.style.display = "block";
+
+    // Function to hide the modal
+    function hideModal() {
+      modalContainer.style.display = "none";
+    }
+
+    // Close modal on click outside of it
+    window.onclick = function (event) {
+      if (event.target == modalContainer) {
+        hideModal();
+      }
+    };
+
+    // Close modal with Escape key
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        hideModal();
+      }
+    });
+
+    // Close modal when the "X" button is clicked
+    closeButton.onclick = function () {
+      hideModal();
+    };
+  }
+
   function showLoadingMessage() {
     const loadingMessage = document.createElement("div");
     loadingMessage.innerText = "Loading Pokémon data...";
@@ -114,29 +170,29 @@ let pokemonRepository = (function () {
   function hideLoadingMessage() {
     const loadingMessage = document.getElementById("loading-message");
     if (loadingMessage) {
-      loadingMessage.parentNode.removeChild(loadingUserListMessage);
+      loadingMessage.parentNode.removeChild(loadingMessage);
     }
   }
 
   // Expose these new methods via the repository's public interface
   return {
-    getAll: getAll,
-    add: add,
-    findByName: findByName,
-    renderList: renderList,
-    loadList: loadList, // Make sure to expose loadList
-    loadDetails: loadDetails, // And loadDetails
+    getAll,
+    add,
+    findByName,
+    renderList,
+    loadList,
+    loadDetails,
   };
 })();
 
-// Create the initial list container
+// Initial setup
 document.querySelector("#pokemon-container").innerHTML =
   '<ul class="pokemon-list"></ul>';
 
 // Initial rendering of the list
 pokemonRepository.renderList();
 
-// ***ACTIONS***
+// *** ACTIONS ***
 
 // Adding a new Pokémon
 pokemonRepository.add({

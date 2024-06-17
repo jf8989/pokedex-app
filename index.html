@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,22 @@
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,Promise"></script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
-    <h1>Pokédex</h1> 
+    <h1>Pokédex</h1>
     <div id="pokemon-container">
         <!-- Pokemon lists will be inserted here by JavaScript -->
     </div>
+    <!-- Modal Structure -->
+    <div id="pokemonModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="pokemonName"></h2>
+            <p id="pokemonHeight"></p>
+            <img id="pokemonImage" alt="Pokemon Image">
+        </div>
+    </div>
     <script src="js/scripts.js"></script>
 </body>
+
 </html>

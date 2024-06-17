@@ -31,9 +31,12 @@
 body {
     font-family: Arial, sans-serif;
     font-size: 22px;
-    background: rgba(0, 0, 0, 0.5); /* Fallback color with transparency */
-    color: #ffffff; /* Set to white for better contrast */
-    text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.5); /* Add text shadow for contrast */
+    background: rgba(0, 0, 0, 0.5);
+    /* Fallback color with transparency */
+    color: #ffffff;
+    /* Set to white for better contrast */
+    text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.5);
+    /* Add text shadow for contrast */
     margin: 0;
     padding: 20px;
     position: relative;
@@ -48,45 +51,56 @@ body::before {
     width: 100%;
     height: 100%;
     background: url('../images/background_1.png') no-repeat center center fixed;
-    background-size: cover; /* Ensure the image covers the entire page */
-    opacity: 0.5; /* Adjust the opacity to 90% */
-    z-index: -1; /* Place behind all other content */
+    background-size: cover;
+    /* Ensure the image covers the entire page */
+    opacity: 0.5;
+    /* Adjust the opacity to 90% */
+    z-index: -1;
+    /* Place behind all other content */
 }
 
 h1 {
     text-align: center;
     color: #ff4500;
     font-size: 42px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add text shadow for contrast */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    /* Add text shadow for contrast */
 }
 
 .pokemon-list {
     list-style: none;
     padding: 0;
     max-width: 600px;
-    margin: 0 auto; /* Center the list */
+    margin: 0 auto;
+    /* Center the list */
 }
 
+/* Unused class */
 .pokemon-list h2 {
-    margin-top: 40px; /* Add space below each header */
+    margin-top: 40px;
+    /* Add space below each header */
 }
 
 .pokemon-list li {
     background: #fff;
     color: #252222;
-    border: px solid #ff6347;
+    border: 2px solid #ff6347;
+    /* Fixed border value */
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     font-size: 1rem;
-    text-align: center; /* Center the text */
-    transition: transform 0.3s ease; /* Add transition for smooth movement */
+    text-align: center;
+    /* Center the text */
+    transition: transform 0.3s ease;
+    /* Add transition for smooth movement */
 }
 
 /* Hover effect */
 .pokemon-list li:hover {
-    transform: translateY(-10px); /* Move up by 10px */
+    transform: translateY(-10px);
+    /* Move up by 10px */
 }
 
 .pokemon-list li button {
@@ -103,77 +117,99 @@ h1 {
     /* Optional: add rounded corners */
     padding: 10px 24px;
     /* Adjust padding as needed */
-    text-align: center;
-    /* Center the text */
     transition: transform 0.3s ease;
     /* Add transition for smooth movement */
 }
 
 /* Background colors and border colors for types */
 .pokemon-list li.fire {
-    background-color: #ffcccb; /* Pastel red for fire type */
-    border: 2px solid #ff6347; /* Stronger red for border */
+    background-color: #ffcccb;
+    /* Pastel red for fire type */
+    border: 2px solid #ff6347;
+    /* Stronger red for border */
 }
 
 .pokemon-list li.water {
-    background-color: #add8e6; /* Light blue for water type */
-    border: 2px solid #4682b4; /* Stronger blue for border */
+    background-color: #add8e6;
+    /* Light blue for
+border: 2px solid #4682b4; /* Stronger blue for border */
 }
 
 /* Add more types as needed */
 .pokemon-list li.grass {
-    background-color: #98fb98; /* Light green for grass type */
-    border: 2px solid hsl(146, 50%, 36%); /* Stronger green for border */
+    background-color: #98fb98;
+    /* Light green for grass type */
+    border: 2px solid hsl(146, 50%, 36%);
+    /* Stronger green for border */
 }
 
 .pokemon-list li.electric {
-    background-color: #ffffe0; /* Light yellow for electric type */
-    border: 2px solid #ffd700; /* Stronger yellow for border */
+    background-color: #ffffe0;
+    /* Light yellow for electric type */
+    border: 2px solid #ffd700;
+    /* Stronger yellow for border */
 }
 
 .pokemon-list li.ghost {
-    background-color: #e6e6fa; /* Light lavender for ghost type */
-    border: 2px solid #9370db; /* Stronger lavender for border */
+    background-color: #e6e6fa;
+    /* Light lavender for ghost type */
+    border: 2px solid #9370db;
+    /* Stronger lavender for border */
 }
 
 .pokemon-list li.psychic {
-    background-color: #8392de; /* Light pink for psychic type */
-    border: 2px solid #4860d8; /* Stronger pink for border */
+    background-color: #8392de;
+    /* Light pink for psychic type */
+    border: 2px solid #4860d8;
+    /* Stronger pink for border */
 }
 
 .pokemon-list li.fighting {
-    background-color: #f4a460; /* Sandy brown for fighting type */
-    border: 2px solid #a0522d; /* Stronger brown for border */
+    background-color: #f4a460;
+    /* Sandy brown for fighting type */
+    border: 2px solid #a0522d;
+    /* Stronger brown for border */
 }
 
 .pokemon-list li.steel {
-    background-color: #c0c0c0; /* Silver for steel type */
-    border: 2px solid #708090; /* Stronger gray for border */
+    background-color: #c0c0c0;
+    /* Silver for steel type */
+    border: 2px solid #708090;
+    /* Stronger gray for border */
 }
 
 .pokemon-list li.dark {
-    background-color: #a9a9a9; /* Dark gray for dark type */
-    border: 2px solid #696969; /* Stronger dark gray for border */
+    background-color: #a9a9a9;
+    /* Dark gray for dark type */
+    border: 2px solid #696969;
+    /* Stronger dark gray for border */
 }
 
 .pokemon-list li.dragon {
-    background-color: #b0c4de; /* Light steel blue for dragon type */
-    border: 2px solid #4682b4; /* Stronger blue for border */
+    background-color: #b0c4de;
+    /* Light steel blue for dragon type */
+    border: 2px solid #4682b4;
+    /* Stronger blue for border */
 }
 
 .pokemon-list li.ice {
-    background-color: #e0ffff; /* Light cyan for ice type */
-    border: 2px solid #afeeee; /* Stronger cyan for border */
+    background-color: #e0ffff;
+    /* Light cyan for ice type */
+    border: 2px solid #afeeee;
+    /* Stronger cyan for border */
 }
 
 .pokemon-list li.poison {
-    background-color: #c6b1c0; /* Light cyan for ice type */
-    border: 2px solid #9d218b; /* Stronger cyan for border */
+    background-color: #c6b1c0;
+    /* Light cyan for ice type */
+    border: 2px solid #9d218b;
+    /* Stronger cyan for border */
 }
 
-/* Background color intensity based on height */
+/* Unused class */
 .pokemon-list li.tall {
-    border-width: 3px; /* Thicker border for taller Pokémon */
+    border-width: 3px;
+    /* Thicker border for taller Pokémon */
 }
 
 .pokemon-list li span {
@@ -191,5 +227,62 @@ h1 {
 }
 
 .pokemon-list li:last-child {
-    margin-bottom: 40px; /* Adjust this value to control the space */
+    margin-bottom: 40px;
+    /* Adjust this value to control the space */
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+.modal-content {
+    background-color: #f0e1f4; /* Pastel background */
+    color: #5a3d55; /* Contrast text color */
+    margin: 5% auto; /* Adjusted for better centering */
+    padding: 20px;
+    border: 2px solid #9a8c98; /* Nice border color */
+    width: auto; /* Adjust width to content */
+    max-width: 50%; /* Limit maximum width */
+    border-radius: 10px; /* Rounded corners */
+    display: flex; /* Use flexbox for centering */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center children horizontally */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    transition: transform 0.5s ease; /* Smooth transition for hover effect */
+    animation: levitate 2s ease-in-out infinite; /* Apply levitating animation */
+}
+
+.modal-content:hover {
+    transform: translateY(-10px); /* Levitation effect */
+}
+
+#pokemonImage {
+    max-width: 150%;
+    height: auto;
+}
+
+/* Style for the close button, assuming it has a class 'close' */
+.close {
+    align-self: flex-end; /* Position the close button to the right */
+    cursor: pointer; /* Change cursor to pointer for better UX */
+}
+
+/* Define the levitating animation */
+@keyframes levitate {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
 }
