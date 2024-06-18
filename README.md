@@ -26,5 +26,5 @@ A dynamic and interactive Pokedex application that provides detailed information
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/pokedex-app.git
+   git clone https://github.com/jf8989/pokedex-app.git
    cd pokedex-app
