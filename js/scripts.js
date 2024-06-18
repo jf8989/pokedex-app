@@ -1,3 +1,5 @@
+/* global $ */
+
 // IIFE to create a Pokémon repository
 let pokemonRepository = (function () {
   let pokemonList = [];
@@ -28,7 +30,7 @@ let pokemonRepository = (function () {
   // Function to find a Pokémon by name
   function findByName(name) {
     return pokemonList.filter(
-      (pokemon) => pokemon.name.toLowerCase() === name.toLowerCase()
+      (pokemon) => pokemon.name.toLowerCase() === name.toLowerCase(),
     );
   }
 
@@ -49,18 +51,18 @@ let pokemonRepository = (function () {
     let ul = document.querySelector("#pokemon-list");
     let li = document.createElement("li");
     li.classList.add("list-group-item", "pokemon-item"); // Add custom class
-  
+
     let typesText = pokemon.types.join(", ");
     let displayText = `${capitalizeFirstLetter(pokemon.name)} (Height: ${
       pokemon.height
     }, Types: ${typesText})`;
-    
+
     if (pokemon.height > 7) {
       displayText += ` - <span class="big">Wow, that’s big!</span>`;
     } else {
       displayText += ` - <span class="small">That's a small one.</span>`;
     }
-  
+
     let button = document.createElement("button");
     button.innerHTML = displayText;
     button.classList.add("btn", "pokemon-button"); // Custom class for button
@@ -69,15 +71,17 @@ let pokemonRepository = (function () {
     button.addEventListener("click", () => {
       showDetails(pokemon);
     });
-  
+
     li.appendChild(button);
     ul.appendChild(li);
-  }  
+  }
 
   // *** API INTERACTIONS ***
 
   // Function to load the list of Pokémon from the API
-  function loadList(url = "https://pokeapi.co/api/v2/pokemon?limit=100&offset=0") {
+  function loadList(
+    url = "https://pokeapi.co/api/v2/pokemon?limit=100&offset=0",
+  ) {
     showLoadingMessage(); // Show loading message at the start
     return fetch(url)
       .then((response) => response.json())
@@ -90,7 +94,7 @@ let pokemonRepository = (function () {
           };
           add(pokemon);
         });
-  
+
         // Check if there is another page
         if (json.next) {
           return loadList(json.next); // Fetch next page
@@ -105,7 +109,7 @@ let pokemonRepository = (function () {
         console.error(e);
         hideLoadingMessage(); // Hide loading message if an error occurs
       });
-  }  
+  }
 
   // Function to load detailed data for a given Pokémon
   function loadDetails(pokemon) {
@@ -125,7 +129,7 @@ let pokemonRepository = (function () {
         console.error(e);
         hideLoadingMessage(); // Hide loading message if an error occurs
       });
-  }  
+  }
 
   // Function to show detailed Pokémon information
   function showDetails(pokemon) {
@@ -184,21 +188,21 @@ let pokemonRepository = (function () {
       loadingMessage.style.height = "100%";
       loadingMessage.style.backgroundColor = "rgba(0,0,0,0.5)";
       loadingMessage.style.zIndex = "9999";
-  
+
       const spinner = document.createElement("div");
       spinner.className = "spinner-border text-light";
       spinner.setAttribute("role", "status");
-  
+
       const spinnerText = document.createElement("span");
       spinnerText.className = "sr-only";
       spinnerText.innerText = "Loading...";
-  
+
       spinner.appendChild(spinnerText);
       loadingMessage.appendChild(spinner);
       document.body.appendChild(loadingMessage);
     }
   }
-  
+
   function hideLoadingMessage() {
     const loadingMessage = document.getElementById("loading-message");
     if (loadingMessage) {
@@ -210,33 +214,35 @@ let pokemonRepository = (function () {
   function getPageItems() {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    console.log(`Getting items for page ${currentPage}, startIndex: ${startIndex}, endIndex: ${endIndex}`);
+    console.log(
+      `Getting items for page ${currentPage}, startIndex: ${startIndex}, endIndex: ${endIndex}`,
+    );
     return pokemonList.slice(startIndex, endIndex);
   }
 
   function updatePaginationControls() {
     const totalPages = Math.ceil(pokemonList.length / itemsPerPage);
     console.log(`Total pages: ${totalPages}`);
-    
-    const prevPageButton = document.getElementById('prev-page');
-    const nextPageButton = document.getElementById('next-page');
-    
+
+    const prevPageButton = document.getElementById("prev-page");
+    const nextPageButton = document.getElementById("next-page");
+
     if (prevPageButton) {
       prevPageButton.disabled = currentPage === 1;
     }
     if (nextPageButton) {
       nextPageButton.disabled = currentPage === totalPages;
     }
-  
+
     // Update page counter
     updatePageCounter(totalPages);
-  } 
-  
+  }
+
   function updatePageCounter(totalPages) {
-    const pageCounter = document.getElementById('page-counter');
+    const pageCounter = document.getElementById("page-counter");
     pageCounter.innerText = `${currentPage}/${totalPages}`;
-  }  
-  
+  }
+
   function goToNextPage() {
     const totalPages = Math.ceil(pokemonList.length / itemsPerPage);
     if (currentPage < totalPages) {
@@ -245,7 +251,7 @@ let pokemonRepository = (function () {
       updatePaginationControls(); // Update controls after changing page
     }
   }
-  
+
   function goToPrevPage() {
     if (currentPage > 1) {
       currentPage--;
@@ -253,9 +259,9 @@ let pokemonRepository = (function () {
       updatePaginationControls(); // Update controls after changing page
     }
   }
-  
-  document.getElementById('next-page').addEventListener('click', goToNextPage);
-  document.getElementById('prev-page').addEventListener('click', goToPrevPage);  
+
+  document.getElementById("next-page").addEventListener("click", goToNextPage);
+  document.getElementById("prev-page").addEventListener("click", goToPrevPage);
 
   // Expose these new methods via the repository's public interface
   return {
@@ -266,7 +272,7 @@ let pokemonRepository = (function () {
     loadList,
     loadDetails,
     updatePaginationControls, // Expose the function
-  };  
+  };
 })();
 
 // Initial setup
