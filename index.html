@@ -1,29 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokédex</title>
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,Promise"></script>
-    <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokédex</title>
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,Promise"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/styles.css"> <!-- Custom styles -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
-
 <body>
-    <h1>Pokédex</h1>
-    <div id="pokemon-container">
-        <!-- Pokemon lists will be inserted here by JavaScript -->
-    </div>
-    <!-- Modal Structure -->
-    <div id="pokemonModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2 id="pokemonName"></h2>
-            <p id="pokemonHeight"></p>
-            <img id="pokemonImage" alt="Pokemon Image">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <a class="navbar-brand" href="index.html">Pokédex</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </nav>
+  <h1>Pokédex</h1>
+  <div id="page-counter" class="text-center">1/10</div>
+  <div id="pokemon-container">
+    <ul class="list-group" id="pokemon-list">
+      <!-- Pokémon lists will be inserted here by JavaScript -->
+    </ul>
+  </div>
+  <!-- Modal Structure -->
+  <div class="modal fade" id="pokemonModal" tabindex="-1" role="dialog" aria-labelledby="pokemonModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="pokemonModalLabel">Pokemon Details</h5>
         </div>
+        <div class="modal-body">
+          <h2 id="pokemonName"></h2>
+          <p id="pokemonHeight"></p>
+          <img id="pokemonImage" alt="Pokemon Image">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
-    <script src="js/scripts.js"></script>
+  </div>
+  <!-- Pagination Controls -->
+  <button id="prev-page" class="btn btn-primary" disabled>&laquo;</button>
+  <button id="next-page" class="btn btn-primary">&raquo;</button>
+  <script src="js/scripts.js"></script>
 </body>
-
 </html>
