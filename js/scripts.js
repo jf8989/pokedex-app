@@ -280,7 +280,7 @@ let pokemonRepository = (function () {
       modalTitle.innerText = capitalizedPokemonName;
       pokemonName.innerText = capitalizedPokemonName;
       pokemonHeight.innerText = `Height: ${pokemon.height ? pokemon.height / 10 + ' m' : 'N/A'}`;
-      pokemonImage.src = pokemon.imageUrl ? pokemon.imageUrl : 'images/pokeball-placeholder.png'; // Use a placeholder image
+      pokemonImage.src = pokemon.imageUrl ? pokemon.imageUrl : 'images/pokeball.png'; // Use a placeholder image
       pokemonImage.alt = pokemon.imageUrl ? `Image of ${capitalizedPokemonName}` : 'Image not available';
       pokemonTypes.innerHTML = ''; // Clear previous types
       if (pokemon.types && pokemon.types.length > 0) {
