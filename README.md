@@ -9,9 +9,8 @@
 ---
 
 <p align="center">
-  <img src="images/screenshot.png" alt="Pokédex Screenshot" width="70%"> 
+  <img src="images/pokedex.jpg" alt="Pokédex Screenshot" width="70%"> 
   <br>
-  <em>⬆️ Suggestion: Replace with an actual screenshot or GIF of your app! ⬆️</em>
 </p>
 
 ---
