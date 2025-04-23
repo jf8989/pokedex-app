@@ -1,76 +1,109 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pokédex</title>
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,Promise"></script>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
-    <link rel="stylesheet" href="dist/styles.min.css">
-    <!-- Custom styles -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-      <a class="navbar-brand" href="index.html">Pokédex by Juan Francisco Marcenaro A.</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </nav>
-    <h1>Pokédex</h1>
-    <div id="page-counter" class="text-center">1/10</div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokédex - Gotta Catch 'Em All!</title> <!-- Updated Title -->
+  <!-- Polyfills -->
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,Promise"></script>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <!-- Google Fonts (Example: Press Start 2P for retro feel, or Roboto for modern) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet">
+  <!-- Custom styles (Make sure this links to your compiled/final CSS) -->
+  <link rel="stylesheet" href="dist/styles.min.css"> <!-- Link to minified -->
+  <!-- <link rel="stylesheet" href="css/styles.css"> --> <!-- Link to source for dev -->
+
+  <!-- Favicon (Add a pokeball icon!) -->
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon"> <!-- Add favicon.ico to images folder -->
+
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top pokedex-nav"> <!-- Dark navbar -->
+    <a class="navbar-brand" href="#">
+      <img src="images/pokeball-icon.png" width="30" height="30" class="d-inline-block align-top" alt="Pokeball icon">
+      <!-- Add icon -->
+      Pokédex
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Optional: Add search or other nav items here in the collapse div -->
+    <!-- <div class="collapse navbar-collapse" id="navbarNav"> ... </div> -->
+  </nav>
+
+  <!-- Main Content Container -->
+  <div class="container mt-5 pt-5"> <!-- Added top padding/margin for fixed navbar -->
+    <h1 class="text-center mb-4 site-title">Choose Your Pokémon!</h1>
+
+    <!-- Pokemon Grid Container -->
     <div id="pokemon-container">
-      <ul class="list-group" id="pokemon-list">
-        <!-- Pokémon lists will be inserted here by JavaScript -->
-      </ul>
+      <!-- The JS will create a div.row#pokemon-grid inside here -->
+      <div id="pokemon-grid" class="row">
+        <!-- Pokémon cards will be inserted here by JavaScript -->
+      </div>
     </div>
-    <!-- Modal Structure -->
-    <div
-      class="modal fade"
-      id="pokemonModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="pokemonModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="pokemonModalLabel">Pokemon Details</h5>
+
+    <!-- Pagination Controls Container -->
+    <div id="pagination-controls" class="d-flex justify-content-center align-items-center my-4">
+      <button id="prev-page" class="btn btn-pagination mx-2" disabled>
+        « Prev <!-- Using HTML entity for arrow -->
+      </button>
+      <span id="page-counter" class="page-info mx-3">Page 1 of X</span>
+      <button id="next-page" class="btn btn-pagination mx-2">
+        Next » <!-- Using HTML entity for arrow -->
+      </button>
+    </div>
+  </div> <!-- End container -->
+
+
+  <!-- Modal Structure -->
+  <div class="modal fade" id="pokemonModal" tabindex="-1" role="dialog" aria-labelledby="pokemonModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document"> <!-- Centered modal -->
+      <div class="modal-content pokemon-modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="pokemonModalLabel">Pokémon Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body text-center"> <!-- Centered body -->
+          <img id="pokemonImage" alt="Pokemon Image" class="pokemon-modal-image mb-3"
+            src="images/pokeball-placeholder.png" /> <!-- Placeholder -->
+          <h2 id="pokemonName" class="pokemon-modal-name"></h2>
+          <p id="pokemonHeight" class="pokemon-modal-height"></p>
+          <!-- Container for Types -->
+          <div id="pokemonTypes" class="pokemon-modal-types">
+            <!-- Type spans will be added here by JS -->
           </div>
-          <div class="modal-body">
-            <h2 id="pokemonName"></h2>
-            <p id="pokemonHeight"></p>
-            <img id="pokemonImage" alt="Pokemon Image" />
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
         </div>
       </div>
     </div>
-    <!-- Pagination Controls -->
-    <button id="prev-page" class="btn btn-primary" disabled>&laquo;</button>
-    <button id="next-page" class="btn btn-primary">&raquo;</button>
-    <script src="dist/app.min.js"></script>
-  </body>
+  </div> <!-- End Modal -->
+
+  <!-- Loading Indicator Structure (Hidden by default via CSS) -->
+  <!-- Structure moved to be created by JS in showLoadingMessage -->
+
+  <!-- JavaScript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Custom Script (Make sure this links to your compiled/final JS) -->
+  <script src="dist/app.min.js"></script> <!-- Link to minified -->
+  <!-- <script src="js/scripts.js"></script> --> <!-- Link to source for dev -->
+</body>
+
 </html>

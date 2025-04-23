@@ -1,4 +1,7 @@
 {
+  "name": "pokedex-app",
+  "version": "1.0.0",
+  "description": "A Pokedex App",
   "devDependencies": {
     "@eslint/js": "^9.5.0",
     "clean-css-cli": "^5.6.3",
@@ -6,5 +9,15 @@
     "globals": "^15.6.0",
     "prettier": "^3.3.2",
     "uglify-js": "^3.18.0"
+  },
+  "scripts": {
+    "minify:css": "cleancss -o dist/styles.min.css css/styles.css",
+    "minify:js": "uglifyjs js/scripts.js -o dist/app.min.js -c -m",
+    "build": "npm run minify:css && npm run minify:js",
+    "lint": "eslint js/**/*.js",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "pokedex-app": "file:"
   }
 }
