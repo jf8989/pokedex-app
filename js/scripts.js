@@ -6,7 +6,7 @@ let pokemonRepository = (function () {
   let pokemonList = [];
   let currentPage = 1;
   // --- CHANGE: Updated items per page ---
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
   const CACHE_KEY = "pokemonListCache";
 
   // *** Logging Setup ***

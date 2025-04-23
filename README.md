@@ -119,13 +119,6 @@ pokedex-app/
 *   `npm run build`: 📦 Create minified CSS and JS files in `dist/`.
 
 > **Remember:** Ensure `index.html` links to the minified files (`dist/styles.min.css` & `dist/app.min.js`) for deployment.
-
-> **Pro Tip:** Create a `.gitignore` file to exclude `node_modules` from Git tracking:
-> ```gitignore
-> # .gitignore
-> node_modules/
-> ```
-
 ---
 
 ## 🙌 Contributing
