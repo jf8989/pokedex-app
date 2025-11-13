@@ -48,15 +48,47 @@
     <!-- <div class="collapse navbar-collapse" id="navbarNav"> ... </div> -->
   </nav>
 
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Explore the World<br><span class="hero-highlight">of Pokémon</span></h1>
+      <p class="hero-subtitle">Discover detailed information about all Pokémon, including stats, evolutions, and multiple forms</p>
+      <div class="hero-search">
+        <input type="text" id="pokemon-search" class="search-input" placeholder="Search Pokémon by name..." aria-label="Search Pokémon">
+        <button id="clear-search" class="clear-search" aria-label="Clear search" style="display:none;">×</button>
+      </div>
+      <div class="hero-badges">
+        <span class="hero-badge">⚡ 151 Gen I Pokémon</span>
+        <span class="hero-badge">🎨 Shiny Forms</span>
+        <span class="hero-badge">🔄 Evolution Chains</span>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <span>Scroll to explore</span>
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+    </div>
+  </section>
+
   <!-- Main Content Container -->
   <div class="container mt-5 pt-5">
-    <h1 class="text-center mb-4 site-title">Choose Your Pokémon!</h1>
+    <!-- Search Results Info -->
+    <div id="search-results-info" class="text-center mb-4" style="display:none;">
+      <p class="search-info-text"></p>
+    </div>
 
     <!-- Pokemon Grid Container -->
     <div id="pokemon-container">
       <div id="pokemon-grid" class="row">
         <!-- Pokémon cards will be inserted here by JavaScript -->
       </div>
+    </div>
+
+    <!-- No Results Message -->
+    <div id="no-results" class="text-center py-5" style="display:none;">
+      <div class="no-results-icon">😢</div>
+      <h3 class="no-results-title">No Pokémon Found</h3>
+      <p class="no-results-text">Try searching for a different Pokémon</p>
     </div>
 
     <!-- Pagination Controls Container -->
@@ -75,22 +107,78 @@
   <!-- Modal Structure -->
   <div class="modal fade" id="pokemonModal" tabindex="-1" role="dialog" aria-labelledby="pokemonModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
       <div class="modal-content pokemon-modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="pokemonModalLabel">Pokémon Details</h5>
+        <div class="modal-header pokemon-modal-header">
+          <div class="modal-header-content">
+            <span class="pokemon-number" id="pokemonNumber">#001</span>
+            <h5 class="modal-title" id="pokemonModalLabel">Pokémon Details</h5>
+            <p class="pokemon-genus" id="pokemonGenus"></p>
+            <div class="pokemon-badges" id="pokemonBadges"></div>
+          </div>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <div class="modal-body text-center">
-          <!-- Ensure pokeball.png exists in images folder for placeholder -->
-          <img id="pokemonImage" alt="Pokemon Image" class="pokemon-modal-image mb-3" src="images/pokeball.png" />
-          <!-- Default src can be placeholder -->
-          <h2 id="pokemonName" class="pokemon-modal-name"></h2>
-          <p id="pokemonHeight" class="pokemon-modal-height"></p>
-          <div id="pokemonTypes" class="pokemon-modal-types">
-            <!-- Type spans will be added here by JS -->
+        <div class="modal-body">
+          <!-- Pokemon Image and Sprite Toggle -->
+          <div class="text-center mb-4">
+            <div class="pokemon-image-container">
+              <img id="pokemonImage" alt="Pokemon Image" class="pokemon-modal-image" src="images/pokeball.png" />
+            </div>
+            <div class="sprite-toggle" id="spriteToggle">
+              <!-- Sprite buttons will be added by JS -->
+            </div>
+          </div>
+
+          <!-- Pokemon Name and Types -->
+          <div class="text-center mb-4">
+            <h2 id="pokemonName" class="pokemon-modal-name"></h2>
+            <div id="pokemonTypes" class="pokemon-modal-types">
+              <!-- Type spans will be added here by JS -->
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="pokemon-section mb-4" id="pokemonDescriptionSection" style="display:none;">
+            <h6 class="section-title">Description</h6>
+            <p id="pokemonDescription" class="pokemon-description"></p>
+          </div>
+
+          <!-- Physical Info -->
+          <div class="pokemon-physical mb-4">
+            <div class="row">
+              <div class="col-6">
+                <div class="info-box">
+                  <span class="info-label">Height</span>
+                  <span id="pokemonHeight" class="info-value"></span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="info-box">
+                  <span class="info-label">Weight</span>
+                  <span id="pokemonWeight" class="info-value"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Abilities -->
+          <div class="pokemon-section mb-4" id="pokemonAbilitiesSection" style="display:none;">
+            <h6 class="section-title">Abilities</h6>
+            <div id="pokemonAbilities" class="pokemon-abilities"></div>
+          </div>
+
+          <!-- Stats -->
+          <div class="pokemon-section mb-4" id="pokemonStatsSection" style="display:none;">
+            <h6 class="section-title">Base Stats</h6>
+            <div id="pokemonStats" class="pokemon-stats"></div>
+          </div>
+
+          <!-- Evolution Chain -->
+          <div class="pokemon-section" id="pokemonEvolutionSection" style="display:none;">
+            <h6 class="section-title">Evolution Chain</h6>
+            <div id="pokemonEvolution" class="pokemon-evolution"></div>
           </div>
         </div>
         <div class="modal-footer">
