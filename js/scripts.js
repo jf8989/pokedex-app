@@ -376,10 +376,16 @@ let pokemonRepository = (function () {
 
   async function parseEvolutionChain(chain) {
     const evolutions = [];
-    let current = chain;
+    const visited = new Set();
 
-    while (current) {
-      const speciesId = extractIdFromUrl(current.species.url);
+    async function processEvolution(node, depth = 0) {
+      const speciesId = extractIdFromUrl(node.species.url);
+      const speciesKey = `${node.species.name}-${speciesId}`;
+
+      // Avoid duplicates
+      if (visited.has(speciesKey)) return;
+      visited.add(speciesKey);
+
       try {
         const pokemonRes = await fetch(
           `https://pokeapi.co/api/v2/pokemon/${speciesId}`
@@ -388,21 +394,28 @@ let pokemonRepository = (function () {
 
         evolutions.push({
           id: speciesId,
-          name: current.species.name,
+          name: node.species.name,
           image:
             pokemonData.sprites.other["official-artwork"].front_default ||
             pokemonData.sprites.front_default,
-          level: current.evolution_details[0]?.min_level || null,
-          trigger: current.evolution_details[0]?.trigger.name || null,
-          item: current.evolution_details[0]?.item?.name || null,
+          level: node.evolution_details[0]?.min_level || null,
+          trigger: node.evolution_details[0]?.trigger.name || null,
+          item: node.evolution_details[0]?.item?.name || null,
+          depth: depth,
         });
       } catch (e) {
-        log("warn", `Failed to load evolution: ${current.species.name}`, e);
+        log("warn", `Failed to load evolution: ${node.species.name}`, e);
       }
 
-      current = current.evolves_to[0] || null;
+      // Process all evolution branches
+      if (node.evolves_to && node.evolves_to.length > 0) {
+        for (const evolution of node.evolves_to) {
+          await processEvolution(evolution, depth + 1);
+        }
+      }
     }
 
+    await processEvolution(chain);
     return evolutions;
   }
 
@@ -548,64 +561,103 @@ let pokemonRepository = (function () {
       const evolutionDiv = document.getElementById("pokemonEvolution");
       evolutionDiv.innerHTML = "";
 
-      data.evolutionChain.forEach((evo, index) => {
-        // Evolution item
-        const evoItem = document.createElement("div");
-        evoItem.classList.add("evolution-item");
-        evoItem.setAttribute("data-pokemon-name", evo.name);
-        evoItem.setAttribute("role", "button");
-        evoItem.setAttribute("tabindex", "0");
-        evoItem.setAttribute("aria-label", `View ${evo.name} details`);
-
-        const evoImg = document.createElement("img");
-        evoImg.classList.add("evolution-image");
-        evoImg.src = evo.image;
-        evoImg.alt = evo.name;
-
-        const evoName = document.createElement("div");
-        evoName.classList.add("evolution-name");
-        evoName.innerText = capitalizeFirstLetter(evo.name);
-
-        evoItem.appendChild(evoImg);
-        evoItem.appendChild(evoName);
-
-        if (evo.level) {
-          const evoLevel = document.createElement("div");
-          evoLevel.classList.add("evolution-level");
-          evoLevel.innerText = `Lv. ${evo.level}`;
-          evoItem.appendChild(evoLevel);
-        } else if (evo.item) {
-          const evoLevel = document.createElement("div");
-          evoLevel.classList.add("evolution-level");
-          evoLevel.innerText = evo.item.replace("-", " ");
-          evoItem.appendChild(evoLevel);
+      // Group evolutions by depth
+      const groupedByDepth = {};
+      data.evolutionChain.forEach((evo) => {
+        if (!groupedByDepth[evo.depth]) {
+          groupedByDepth[evo.depth] = [];
         }
+        groupedByDepth[evo.depth].push(evo);
+      });
 
-        // Make evolution clickable
-        evoItem.addEventListener("click", () => {
-          const pokemon = findByName(evo.name);
-          if (pokemon) {
-            $("#pokemonModal").modal("hide");
-            // Small delay to allow modal to hide
-            setTimeout(() => showDetails(pokemon), 300);
+      const depths = Object.keys(groupedByDepth).sort();
+      const currentPokemonName = data.name.toLowerCase();
+
+      depths.forEach((depth, depthIndex) => {
+        const evosAtDepth = groupedByDepth[depth];
+
+        evosAtDepth.forEach((evo, evoIndex) => {
+          // Evolution item
+          const evoItem = document.createElement("div");
+          evoItem.classList.add("evolution-item");
+          evoItem.setAttribute("data-pokemon-name", evo.name);
+
+          // Check if this is the current Pokemon
+          const isCurrentPokemon = evo.name.toLowerCase() === currentPokemonName;
+
+          if (!isCurrentPokemon) {
+            evoItem.setAttribute("role", "button");
+            evoItem.setAttribute("tabindex", "0");
+            evoItem.setAttribute("aria-label", `View ${evo.name} details`);
+          } else {
+            evoItem.classList.add("current-pokemon");
+            evoItem.style.borderColor = "var(--primary-color)";
+            evoItem.style.borderWidth = "3px";
+          }
+
+          const evoImg = document.createElement("img");
+          evoImg.classList.add("evolution-image");
+          evoImg.src = evo.image;
+          evoImg.alt = evo.name;
+
+          const evoName = document.createElement("div");
+          evoName.classList.add("evolution-name");
+          evoName.innerText = capitalizeFirstLetter(evo.name);
+
+          evoItem.appendChild(evoImg);
+          evoItem.appendChild(evoName);
+
+          if (evo.level) {
+            const evoLevel = document.createElement("div");
+            evoLevel.classList.add("evolution-level");
+            evoLevel.innerText = `Lv. ${evo.level}`;
+            evoItem.appendChild(evoLevel);
+          } else if (evo.item) {
+            const evoLevel = document.createElement("div");
+            evoLevel.classList.add("evolution-level");
+            evoLevel.innerText = evo.item.replace("-", " ");
+            evoItem.appendChild(evoLevel);
+          }
+
+          // Make evolution clickable only if it's not the current Pokemon
+          if (!isCurrentPokemon) {
+            evoItem.addEventListener("click", () => {
+              const pokemon = findByName(evo.name);
+              if (pokemon) {
+                $("#pokemonModal").modal("hide");
+                // Small delay to allow modal to hide
+                setTimeout(() => showDetails(pokemon), 300);
+              }
+            });
+
+            evoItem.addEventListener("keypress", (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                const pokemon = findByName(evo.name);
+                if (pokemon) {
+                  $("#pokemonModal").modal("hide");
+                  setTimeout(() => showDetails(pokemon), 300);
+                }
+              }
+            });
+          }
+
+          evolutionDiv.appendChild(evoItem);
+
+          // Add separator between evolutions at the same depth
+          if (evoIndex < evosAtDepth.length - 1) {
+            const separator = document.createElement("span");
+            separator.classList.add("evolution-arrow");
+            separator.innerHTML = "•";
+            separator.style.fontSize = "1.5rem";
+            separator.style.color = "#999";
+            separator.style.padding = "0 0.5rem";
+            evolutionDiv.appendChild(separator);
           }
         });
 
-        evoItem.addEventListener("keypress", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            const pokemon = findByName(evo.name);
-            if (pokemon) {
-              $("#pokemonModal").modal("hide");
-              setTimeout(() => showDetails(pokemon), 300);
-            }
-          }
-        });
-
-        evolutionDiv.appendChild(evoItem);
-
-        // Add arrow between evolutions
-        if (index < data.evolutionChain.length - 1) {
+        // Add arrow between different depths
+        if (depthIndex < depths.length - 1) {
           const arrow = document.createElement("span");
           arrow.classList.add("evolution-arrow");
           arrow.innerHTML = "→";
@@ -735,14 +787,14 @@ let pokemonRepository = (function () {
   function showLoadingMore() {
     const loadingMore = document.getElementById("loading-more");
     if (loadingMore) {
-      loadingMore.style.display = "block";
+      loadingMore.classList.add("visible");
     }
   }
 
   function hideLoadingMore() {
     const loadingMore = document.getElementById("loading-more");
     if (loadingMore) {
-      loadingMore.style.display = "none";
+      loadingMore.classList.remove("visible");
     }
   }
 

@@ -2,9 +2,10 @@
 
 /* === VARIABLES === */
 :root {
-  --primary-color: #e3350d;
-  --secondary-color: #3b4cca;
-  --accent-color: #ffde00;
+  /* Pokemon-themed colors (Pokeball Red, Pokeball White, Pikachu Yellow) */
+  --primary-color: #DC0A2D;
+  --secondary-color: #FFCB05;
+  --accent-color: #3D7DCA;
   --dark-color: #212529;
   --light-color: #f8f9fa;
   --font-primary: 'Roboto', sans-serif;
@@ -13,14 +14,15 @@
   --card-shadow: rgba(0, 0, 0, 0.1);
   --card-hover-shadow: rgba(0, 0, 0, 0.25);
   --text-color: #333;
-  --background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --card-text-color: #212529;
+  --background-gradient: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
   --background-image-url: url('../images/background_1.png');
   --background-opacity: 0.05;
-  --hero-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --hero-gradient: linear-gradient(135deg, #DC0A2D 0%, #3D7DCA 100%);
   --modal-bg: #ffffff;
-  --modal-header-gradient: linear-gradient(135deg, #e3350d 0%, #3b4cca 100%);
+  --modal-header-gradient: linear-gradient(135deg, #DC0A2D 0%, #FFCB05 100%);
   --section-bg: #f8f9fa;
-  --info-box-gradient: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  --info-box-gradient: linear-gradient(135deg, #DC0A2D15 0%, #FFCB0515 100%);
 
   /* Type Colors */
   --type-normal: #A8A77A;
@@ -45,22 +47,23 @@
 
 /* Dark Mode Variables */
 [data-theme="dark"] {
-  --primary-color: #ff6b6b;
-  --secondary-color: #5b7dff;
-  --accent-color: #ffd93d;
+  --primary-color: #FF1744;
+  --secondary-color: #FFD600;
+  --accent-color: #448AFF;
   --dark-color: #f8f9fa;
   --light-color: #212529;
   --card-bg: #2d3748;
   --card-shadow: rgba(0, 0, 0, 0.3);
   --card-hover-shadow: rgba(0, 0, 0, 0.5);
   --text-color: #e2e8f0;
+  --card-text-color: #1a202c;
   --background-gradient: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
   --background-opacity: 0.1;
-  --hero-gradient: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  --hero-gradient: linear-gradient(135deg, #FF1744 0%, #448AFF 100%);
   --modal-bg: #2d3748;
-  --modal-header-gradient: linear-gradient(135deg, #ff6b6b 0%, #5b7dff 100%);
+  --modal-header-gradient: linear-gradient(135deg, #FF1744 0%, #FFD600 100%);
   --section-bg: #1a202c;
-  --info-box-gradient: linear-gradient(135deg, #4a556820 0%, #2d374820 100%);
+  --info-box-gradient: linear-gradient(135deg, #FF174420 0%, #FFD60020 100%);
 }
 
 /* === RESET & BASE === */
@@ -432,8 +435,9 @@ body::before {
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
-  color: var(--dark-color);
+  color: var(--card-text-color);
   text-transform: capitalize;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 .pokemon-type-badge {
@@ -771,6 +775,18 @@ body::before {
   transform: scale(1.05);
 }
 
+.evolution-item.current-pokemon {
+  border-color: var(--primary-color);
+  border-width: 3px;
+  cursor: default;
+}
+
+.evolution-item.current-pokemon:hover {
+  transform: scale(1.0);
+  background: var(--section-bg);
+  box-shadow: none;
+}
+
 .evolution-image {
   width: 80px;
   height: 80px;
@@ -837,11 +853,14 @@ body::before {
 
 /* Loading More Indicator */
 #loading-more {
+  visibility: hidden;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  min-height: 100px;
 }
 
-#loading-more[style*="display: block"] {
+#loading-more.visible {
+  visibility: visible;
   opacity: 1;
 }
 
