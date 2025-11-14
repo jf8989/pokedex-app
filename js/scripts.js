@@ -668,22 +668,27 @@ let pokemonRepository = (function () {
           // Make evolution clickable only if it's not the current Pokemon
           if (!isCurrentPokemon) {
             evoItem.addEventListener("click", () => {
-              const pokemon = findByName(evo.name);
-              if (pokemon) {
-                $("#pokemonModal").modal("hide");
-                // Small delay to allow modal to hide
-                setTimeout(() => showDetails(pokemon), 300);
-              }
+              // Create Pokemon object directly from evolution data
+              // This ensures it works even if the Pokemon hasn't been loaded yet
+              const pokemon = {
+                name: evo.name,
+                detailsUrl: `https://pokeapi.co/api/v2/pokemon/${evo.id}/`
+              };
+              $("#pokemonModal").modal("hide");
+              // Small delay to allow modal to hide
+              setTimeout(() => showDetails(pokemon), 300);
             });
 
             evoItem.addEventListener("keypress", (e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                const pokemon = findByName(evo.name);
-                if (pokemon) {
-                  $("#pokemonModal").modal("hide");
-                  setTimeout(() => showDetails(pokemon), 300);
-                }
+                // Create Pokemon object directly from evolution data
+                const pokemon = {
+                  name: evo.name,
+                  detailsUrl: `https://pokeapi.co/api/v2/pokemon/${evo.id}/`
+                };
+                $("#pokemonModal").modal("hide");
+                setTimeout(() => showDetails(pokemon), 300);
               }
             });
           }
