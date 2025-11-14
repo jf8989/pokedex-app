@@ -99,6 +99,31 @@ body::before {
   pointer-events: none;
 }
 
+/* === STICKY SEARCH BAR === */
+.sticky-search {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  padding: 1rem 0;
+  box-shadow: 0 4px 12px var(--card-shadow);
+  z-index: 999;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+  border-bottom: 3px solid var(--primary-color);
+}
+
+.sticky-search.visible {
+  transform: translateY(0);
+}
+
+.sticky-search-inner {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 /* === DARK MODE TOGGLE === */
 .dark-mode-toggle {
   position: fixed;
@@ -147,6 +172,8 @@ body::before {
   position: relative;
   overflow: hidden;
   padding: 80px 20px 60px;
+  border-bottom: 8px solid #FFCB05;
+  box-shadow: inset 0 -20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .hero-overlay {
@@ -184,18 +211,37 @@ body::before {
 .hero-title {
   font-size: clamp(2.5rem, 8vw, 5rem);
   font-weight: 900;
-  color: white;
+  color: #FFCB05;
   margin-bottom: 1rem;
   line-height: 1.1;
-  letter-spacing: -0.02em;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.05em;
+  text-shadow:
+    4px 4px 0 #DC0A2D,
+    -2px -2px 0 #DC0A2D,
+    2px -2px 0 #DC0A2D,
+    -2px 2px 0 #DC0A2D,
+    0 4px 0 #DC0A2D,
+    4px 0 0 #DC0A2D,
+    0 8px 20px rgba(0, 0, 0, 0.5);
+  transform: rotate(-2deg);
+  animation: heroFloat 3s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: rotate(-2deg) translateY(0px); }
+  50% { transform: rotate(-2deg) translateY(-10px); }
 }
 
 .hero-highlight {
-  background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
+  text-shadow:
+    4px 4px 0 #3D7DCA,
+    -2px -2px 0 #3D7DCA,
+    2px -2px 0 #3D7DCA,
+    -2px 2px 0 #3D7DCA,
+    0 4px 0 #3D7DCA,
+    4px 0 0 #3D7DCA,
+    0 8px 20px rgba(0, 0, 0, 0.5);
   display: inline-block;
 }
 
@@ -524,6 +570,7 @@ body::before {
   padding: 1.5rem;
   position: relative;
   border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .modal-header-content {

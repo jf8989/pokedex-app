@@ -96,10 +96,53 @@ let pokemonRepository = (function () {
     return pokemonList.find((p) => p.name.toLowerCase() === name.toLowerCase());
   }
 
+  // === STICKY SEARCH BAR ===
+  function initializeStickySearch() {
+    const stickySearch = document.getElementById("sticky-search");
+    const heroSection = document.querySelector(".hero-section");
+
+    if (!stickySearch || !heroSection) return;
+
+    window.addEventListener("scroll", () => {
+      const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
+      if (window.scrollY > heroBottom - 100) {
+        stickySearch.classList.add("visible");
+      } else {
+        stickySearch.classList.remove("visible");
+      }
+    });
+
+    // Sync the two search inputs
+    const mainSearch = document.getElementById("pokemon-search");
+    const stickySearchInput = document.getElementById("sticky-pokemon-search");
+    const mainClear = document.getElementById("clear-search");
+    const stickyClear = document.getElementById("sticky-clear-search");
+
+    if (mainSearch && stickySearchInput) {
+      mainSearch.addEventListener("input", (e) => {
+        stickySearchInput.value = e.target.value;
+      });
+
+      stickySearchInput.addEventListener("input", (e) => {
+        mainSearch.value = e.target.value;
+        mainSearch.dispatchEvent(new Event("input"));
+      });
+
+      if (mainClear && stickyClear) {
+        stickyClear.addEventListener("click", () => {
+          mainClear.click();
+          stickySearchInput.value = "";
+        });
+      }
+    }
+  }
+
   // === SEARCH FUNCTIONALITY ===
   function initializeSearch() {
     const searchInput = document.getElementById("pokemon-search");
+    const stickySearchInput = document.getElementById("sticky-pokemon-search");
     const clearBtn = document.getElementById("clear-search");
+    const stickyClearBtn = document.getElementById("sticky-clear-search");
     const resultsInfo = document.getElementById("search-results-info");
     const noResults = document.getElementById("no-results");
 
@@ -120,8 +163,9 @@ let pokemonRepository = (function () {
 
       renderFilteredList();
 
-      // Show/hide clear button
+      // Show/hide clear buttons
       clearBtn.style.display = "block";
+      if (stickyClearBtn) stickyClearBtn.style.display = "block";
 
       // Show results info or no results
       if (filteredList.length > 0) {
@@ -146,6 +190,8 @@ let pokemonRepository = (function () {
     searchActive = false;
     filteredList = [];
     document.getElementById("clear-search").style.display = "none";
+    const stickyClear = document.getElementById("sticky-clear-search");
+    if (stickyClear) stickyClear.style.display = "none";
     document.getElementById("search-results-info").style.display = "none";
     document.getElementById("no-results").style.display = "none";
     renderAllLoaded();
@@ -806,6 +852,7 @@ let pokemonRepository = (function () {
   return {
     loadNextBatch,
     initializeSearch,
+    initializeStickySearch,
     initializeDarkMode,
     setupInfiniteScroll,
   };
@@ -826,6 +873,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize features
   pokemonRepository.initializeDarkMode();
   pokemonRepository.initializeSearch();
+  pokemonRepository.initializeStickySearch();
 
   // Load first batch
   pokemonRepository
