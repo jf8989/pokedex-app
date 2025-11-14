@@ -1115,9 +1115,42 @@ body::before {
     margin-bottom: 1rem;
   }
 
-  /* Hide pokeball on small mobile screens */
+  /* Make pokeball smaller on mobile */
   .floating-pokeball {
-    display: none;
+    left: 2%;
+  }
+
+  .pokeball {
+    width: 60px;
+    height: 60px;
+  }
+
+  .pokeball-top,
+  .pokeball-bottom {
+    width: 60px;
+    height: 30px;
+  }
+
+  .pokeball-top {
+    border-top-left-radius: 60px;
+    border-top-right-radius: 60px;
+  }
+
+  .pokeball-bottom {
+    border-bottom-left-radius: 60px;
+    border-bottom-right-radius: 60px;
+  }
+
+  .pokeball-middle {
+    width: 60px;
+    height: 10px;
+  }
+
+  .pokeball-center {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #333;
+    box-shadow: inset 0 0 0 2px white, inset 0 0 0 4px #333;
   }
 }
 
