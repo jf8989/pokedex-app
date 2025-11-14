@@ -1,13 +1,16 @@
 /* eslint-disable no-unused-vars */
 /* global $ */
-// js/scripts.js - Enhanced Stunning UI Version
+// js/scripts.js - Enhanced Stunning UI with Infinite Scroll
 let pokemonRepository = (function () {
   let pokemonList = [];
   let filteredList = [];
-  let currentPage = 1;
-  const itemsPerPage = 12;
-  const CACHE_KEY = "pokemonListCache";
   let searchActive = false;
+  let isLoading = false;
+  let currentOffset = 0;
+  const BATCH_SIZE = 50;
+  const TOTAL_POKEMON = 1302; // Updated as of Gen 9
+  const CACHE_KEY = "pokemonAllCache";
+  let observer = null;
 
   const logGroup = "PokemonRepository";
   const log = (level, ...args) => {
@@ -16,6 +19,70 @@ let pokemonRepository = (function () {
   };
   log("info", "Repository initialized");
 
+  // === DARK MODE ===
+  function initializeDarkMode() {
+    const toggleBtn = document.getElementById("dark-mode-toggle");
+    if (!toggleBtn) return;
+
+    // Check saved preference or default to light
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    toggleBtn.addEventListener("click", () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      const newTheme = currentTheme === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+    });
+  }
+
+  // === PASTEL GRADIENT GENERATOR ===
+  function generatePastelGradient(types) {
+    const typeColorMap = {
+      normal: [168, 167, 122],
+      fire: [238, 129, 48],
+      water: [99, 144, 240],
+      electric: [247, 208, 44],
+      grass: [122, 199, 76],
+      ice: [150, 217, 214],
+      fighting: [194, 46, 40],
+      poison: [163, 62, 161],
+      ground: [226, 191, 101],
+      flying: [169, 143, 243],
+      psychic: [249, 85, 135],
+      bug: [166, 185, 26],
+      rock: [182, 161, 54],
+      ghost: [115, 87, 151],
+      dragon: [111, 53, 252],
+      dark: [112, 87, 70],
+      steel: [183, 183, 206],
+      fairy: [214, 133, 173],
+    };
+
+    if (!types || types.length === 0) {
+      return "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)";
+    }
+
+    // Convert type colors to pastel by blending with white
+    const makePastel = (rgb) => {
+      return rgb.map((c) => Math.round(c + (255 - c) * 0.6));
+    };
+
+    const color1 = typeColorMap[types[0]] || [200, 200, 200];
+    const pastelColor1 = makePastel(color1);
+
+    if (types.length === 1) {
+      const lighterColor = pastelColor1.map((c) =>
+        Math.min(255, c + 20)
+      );
+      return `linear-gradient(135deg, rgb(${pastelColor1.join(",")}), rgb(${lighterColor.join(",")}))`;
+    }
+
+    const color2 = typeColorMap[types[1]];
+    const pastelColor2 = makePastel(color2);
+    return `linear-gradient(135deg, rgb(${pastelColor1.join(",")}), rgb(${pastelColor2.join(",")}))`;
+  }
+
   // === DATA MANAGEMENT ===
   function getAll() {
     return pokemonList;
@@ -23,6 +90,10 @@ let pokemonRepository = (function () {
 
   function getCurrentList() {
     return searchActive ? filteredList : pokemonList;
+  }
+
+  function findByName(name) {
+    return pokemonList.find((p) => p.name.toLowerCase() === name.toLowerCase());
   }
 
   // === SEARCH FUNCTIONALITY ===
@@ -47,8 +118,7 @@ let pokemonRepository = (function () {
         p.name.toLowerCase().includes(query)
       );
 
-      currentPage = 1;
-      renderList();
+      renderFilteredList();
 
       // Show/hide clear button
       clearBtn.style.display = "block";
@@ -75,40 +145,33 @@ let pokemonRepository = (function () {
   function clearSearch() {
     searchActive = false;
     filteredList = [];
-    currentPage = 1;
     document.getElementById("clear-search").style.display = "none";
     document.getElementById("search-results-info").style.display = "none";
     document.getElementById("no-results").style.display = "none";
-    renderList();
+    renderAllLoaded();
+  }
+
+  function renderFilteredList() {
+    const pokemonGridElement = document.querySelector("#pokemon-grid");
+    if (!pokemonGridElement) return;
+
+    pokemonGridElement.innerHTML = "";
+    filteredList.forEach((pokemon) => {
+      addListItem(pokemon);
+    });
+  }
+
+  function renderAllLoaded() {
+    const pokemonGridElement = document.querySelector("#pokemon-grid");
+    if (!pokemonGridElement) return;
+
+    pokemonGridElement.innerHTML = "";
+    pokemonList.forEach((pokemon) => {
+      addListItem(pokemon);
+    });
   }
 
   // === DOM RENDERING ===
-  function renderList() {
-    const pokemonGridElement = document.querySelector("#pokemon-grid");
-    if (!pokemonGridElement) {
-      log("error", "Pokemon grid element not found");
-      return;
-    }
-
-    pokemonGridElement.innerHTML = "";
-    const currentList = getCurrentList();
-    const pageItems = getPageItems();
-
-    pageItems.forEach((pokemon) => {
-      addListItem(pokemon);
-    });
-
-    updatePaginationControls();
-
-    // Hide pagination if searching with few results
-    const paginationControls = document.getElementById("pagination-controls");
-    if (searchActive && currentList.length <= itemsPerPage) {
-      paginationControls.style.display = "none";
-    } else {
-      paginationControls.style.display = "flex";
-    }
-  }
-
   function addListItem(pokemon) {
     const gridRow = document.querySelector("#pokemon-grid");
     if (!gridRow) return;
@@ -124,11 +187,16 @@ let pokemonRepository = (function () {
     card.setAttribute("tabindex", "0");
     card.setAttribute("aria-label", `View details for ${pokemon.name}`);
 
+    // Apply pastel gradient background
+    if (pokemon.types && pokemon.types.length > 0) {
+      card.style.background = generatePastelGradient(pokemon.types);
+    }
+
     // Pokemon number badge
     const numberBadge = document.createElement("span");
     numberBadge.classList.add("pokemon-number-badge");
     const pokemonId = extractIdFromUrl(pokemon.detailsUrl);
-    numberBadge.innerText = `#${pokemonId.toString().padStart(3, "0")}`;
+    numberBadge.innerText = `#${pokemonId.toString().padStart(4, "0")}`;
 
     // Create card body
     const cardBody = document.createElement("div");
@@ -139,9 +207,11 @@ let pokemonRepository = (function () {
     img.classList.add("pokemon-image-preview");
     img.alt = pokemon.name;
     img.src = pokemon.imageUrl || "images/pokeball.png";
-    // Lazy load if not preloaded
-    if (!pokemon.imageUrl) {
-      loadImageForCard(pokemon, img);
+
+    // Add loading class if details not loaded
+    if (!pokemon.imageUrl || !pokemon.types) {
+      card.classList.add("loading");
+      loadImageForCard(pokemon, img, card);
     }
 
     // Pokemon name
@@ -182,45 +252,70 @@ let pokemonRepository = (function () {
   }
 
   // === API INTERACTIONS ===
-  function loadList() {
-    showLoadingMessage("Loading Pokédex...");
-
-    try {
-      const cachedData = sessionStorage.getItem(CACHE_KEY);
-      if (cachedData) {
-        pokemonList = JSON.parse(cachedData);
-        renderList();
-        hideLoadingMessage();
-        preloadDetailsForCurrentPage();
-        return Promise.resolve();
+  function loadNextBatch() {
+    if (isLoading || currentOffset >= TOTAL_POKEMON) {
+      if (currentOffset >= TOTAL_POKEMON) {
+        hideLoadingMore();
       }
-    } catch (e) {
-      log("error", "Cache error", e);
-      sessionStorage.removeItem(CACHE_KEY);
+      return Promise.resolve();
     }
 
-    return fetch("https://pokeapi.co/api/v2/pokemon?limit=151")
+    isLoading = true;
+    showLoadingMore();
+
+    return fetch(
+      `https://pokeapi.co/api/v2/pokemon?limit=${BATCH_SIZE}&offset=${currentOffset}`
+    )
       .then((response) => response.json())
       .then((json) => {
-        pokemonList = json.results.map((item) => ({
+        const newPokemon = json.results.map((item) => ({
           name: item.name,
           detailsUrl: item.url,
         }));
 
-        sessionStorage.setItem(CACHE_KEY, JSON.stringify(pokemonList));
-        renderList();
-        hideLoadingMessage();
-        preloadDetailsForCurrentPage();
+        pokemonList = [...pokemonList, ...newPokemon];
+        currentOffset += BATCH_SIZE;
+
+        // Render new items only if not searching
+        if (!searchActive) {
+          newPokemon.forEach((pokemon) => {
+            addListItem(pokemon);
+          });
+        }
+
+        // Cache the full list
+        try {
+          const cacheData = {
+            list: pokemonList,
+            offset: currentOffset,
+            timestamp: Date.now(),
+          };
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+        } catch (e) {
+          log("warn", "Failed to cache data", e);
+        }
+
+        isLoading = false;
+        hideLoadingMore();
+
+        // If we haven't reached the end, keep observing
+        if (currentOffset < TOTAL_POKEMON) {
+          setupInfiniteScroll();
+        }
       })
       .catch((e) => {
-        log("error", "Failed to load list", e);
-        hideLoadingMessage();
-        displayErrorMessage("Could not load Pokémon. Please refresh.");
+        log("error", "Failed to load batch", e);
+        isLoading = false;
+        hideLoadingMore();
+        displayErrorMessage("Could not load more Pokémon. Please try again.");
       });
   }
 
-  function loadImageForCard(pokemon, imgElement) {
-    if (pokemon.imageUrl) return;
+  function loadImageForCard(pokemon, imgElement, cardElement) {
+    if (pokemon.imageUrl) {
+      cardElement.classList.remove("loading");
+      return;
+    }
 
     fetch(pokemon.detailsUrl)
       .then((res) => res.json())
@@ -229,20 +324,25 @@ let pokemonRepository = (function () {
           data.sprites.other["official-artwork"].front_default ||
           data.sprites.front_default;
         pokemon.types = data.types.map((t) => t.type.name);
+
         if (imgElement && pokemon.imageUrl) {
           imgElement.src = pokemon.imageUrl;
         }
-      })
-      .catch((e) => log("warn", `Failed to load image for ${pokemon.name}`, e));
-  }
 
-  function preloadDetailsForCurrentPage() {
-    const items = getPageItems();
-    items.forEach((pokemon) => {
-      if (!pokemon.imageUrl) {
-        loadImageForCard(pokemon);
-      }
-    });
+        if (cardElement) {
+          cardElement.classList.remove("loading");
+          // Apply pastel gradient after types are loaded
+          if (pokemon.types && pokemon.types.length > 0) {
+            cardElement.style.background = generatePastelGradient(pokemon.types);
+          }
+        }
+      })
+      .catch((e) => {
+        log("warn", `Failed to load image for ${pokemon.name}`, e);
+        if (cardElement) {
+          cardElement.classList.remove("loading");
+        }
+      });
   }
 
   async function loadFullDetails(pokemon) {
@@ -330,12 +430,20 @@ let pokemonRepository = (function () {
     // Pokemon number
     document.getElementById("pokemonNumber").innerText = `#${data.id
       .toString()
-      .padStart(3, "0")}`;
+      .padStart(4, "0")}`;
 
     // Title and name
     const pokemonName = capitalizeFirstLetter(data.name);
     document.getElementById("pokemonModalLabel").innerText = pokemonName;
     document.getElementById("pokemonName").innerText = pokemonName;
+
+    // Apply pastel gradient to modal header
+    const types = data.types.map((t) => t.type.name);
+    const modalHeader = document.querySelector(".pokemon-modal-header");
+    if (modalHeader && types.length > 0) {
+      const gradient = generatePastelGradient(types);
+      modalHeader.style.background = gradient;
+    }
 
     // Genus
     const genusEntry = data.species.genera.find((g) => g.language.name === "en");
@@ -444,6 +552,10 @@ let pokemonRepository = (function () {
         // Evolution item
         const evoItem = document.createElement("div");
         evoItem.classList.add("evolution-item");
+        evoItem.setAttribute("data-pokemon-name", evo.name);
+        evoItem.setAttribute("role", "button");
+        evoItem.setAttribute("tabindex", "0");
+        evoItem.setAttribute("aria-label", `View ${evo.name} details`);
 
         const evoImg = document.createElement("img");
         evoImg.classList.add("evolution-image");
@@ -468,6 +580,27 @@ let pokemonRepository = (function () {
           evoLevel.innerText = evo.item.replace("-", " ");
           evoItem.appendChild(evoLevel);
         }
+
+        // Make evolution clickable
+        evoItem.addEventListener("click", () => {
+          const pokemon = findByName(evo.name);
+          if (pokemon) {
+            $("#pokemonModal").modal("hide");
+            // Small delay to allow modal to hide
+            setTimeout(() => showDetails(pokemon), 300);
+          }
+        });
+
+        evoItem.addEventListener("keypress", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            const pokemon = findByName(evo.name);
+            if (pokemon) {
+              $("#pokemonModal").modal("hide");
+              setTimeout(() => showDetails(pokemon), 300);
+            }
+          }
+        });
 
         evolutionDiv.appendChild(evoItem);
 
@@ -523,6 +656,35 @@ let pokemonRepository = (function () {
     });
   }
 
+  // === INFINITE SCROLL ===
+  function setupInfiniteScroll() {
+    const loadingMoreElement = document.getElementById("loading-more");
+    if (!loadingMoreElement) return;
+
+    // Disconnect existing observer
+    if (observer) {
+      observer.disconnect();
+    }
+
+    // Create intersection observer
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isLoading && !searchActive) {
+            loadNextBatch();
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "200px",
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(loadingMoreElement);
+  }
+
   // === UTILITY FUNCTIONS ===
   function capitalizeFirstLetter(string) {
     if (!string) return "";
@@ -570,90 +732,30 @@ let pokemonRepository = (function () {
     }
   }
 
+  function showLoadingMore() {
+    const loadingMore = document.getElementById("loading-more");
+    if (loadingMore) {
+      loadingMore.style.display = "block";
+    }
+  }
+
+  function hideLoadingMore() {
+    const loadingMore = document.getElementById("loading-more");
+    if (loadingMore) {
+      loadingMore.style.display = "none";
+    }
+  }
+
   function displayErrorMessage(message) {
     alert(`Error: ${message}`);
   }
 
-  // === PAGINATION ===
-  function getPageItems() {
-    const currentList = getCurrentList();
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return currentList.slice(startIndex, endIndex);
-  }
-
-  function updatePaginationControls() {
-    const currentList = getCurrentList();
-    const totalItems = currentList.length;
-    const paginationControlsContainer = document.getElementById(
-      "pagination-controls"
-    );
-
-    if (totalItems === 0 || !paginationControlsContainer) {
-      if (paginationControlsContainer)
-        paginationControlsContainer.style.display = "none";
-      return;
-    }
-
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-    const prevPageButton = document.getElementById("prev-page");
-    const nextPageButton = document.getElementById("next-page");
-    const pageCounter = document.getElementById("page-counter");
-
-    if (prevPageButton) {
-      prevPageButton.disabled = currentPage === 1;
-    }
-
-    if (nextPageButton) {
-      nextPageButton.disabled = currentPage === totalPages;
-    }
-
-    if (pageCounter) {
-      pageCounter.innerText = `Page ${currentPage} of ${totalPages}`;
-    }
-
-    paginationControlsContainer.style.display = "flex";
-  }
-
-  function goToNextPage() {
-    const currentList = getCurrentList();
-    const totalPages = Math.ceil(currentList.length / itemsPerPage);
-    if (currentPage < totalPages) {
-      currentPage++;
-      renderList();
-      preloadDetailsForCurrentPage();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }
-
-  function goToPrevPage() {
-    if (currentPage > 1) {
-      currentPage--;
-      renderList();
-      preloadDetailsForCurrentPage();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }
-
-  function initializePaginationListeners() {
-    const nextButton = document.getElementById("next-page");
-    const prevButton = document.getElementById("prev-page");
-
-    if (nextButton) {
-      nextButton.addEventListener("click", goToNextPage);
-    }
-
-    if (prevButton) {
-      prevButton.addEventListener("click", goToPrevPage);
-    }
-  }
-
   // === PUBLIC API ===
   return {
-    loadList,
-    initializePaginationListeners,
+    loadNextBatch,
     initializeSearch,
+    initializeDarkMode,
+    setupInfiniteScroll,
   };
 })();
 
@@ -669,12 +771,16 @@ document.addEventListener("DOMContentLoaded", function () {
     pokemonContainer.appendChild(grid);
   }
 
-  pokemonRepository.initializePaginationListeners();
+  // Initialize features
+  pokemonRepository.initializeDarkMode();
   pokemonRepository.initializeSearch();
+
+  // Load first batch
   pokemonRepository
-    .loadList()
+    .loadNextBatch()
     .then(() => {
-      console.log("[Pokédex] Ready!");
+      console.log("[Pokédex] First batch loaded!");
+      pokemonRepository.setupInfiniteScroll();
     })
     .catch((error) => {
       console.error("[Pokédex] Initialization error:", error);
