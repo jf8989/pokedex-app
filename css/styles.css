@@ -318,6 +318,90 @@ body::before {
   font-size: 0.95rem;
 }
 
+/* Floating Pokeball */
+.floating-pokeball {
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: pokeballFloat 4s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes pokeballFloat {
+  0%, 100% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-60%) rotate(5deg);
+  }
+  50% {
+    transform: translateY(-40%) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-60%) rotate(-5deg);
+  }
+}
+
+.pokeball {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  border-radius: 50%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.pokeball:hover {
+  transform: scale(1.1) rotate(180deg);
+}
+
+.pokeball-top {
+  width: 120px;
+  height: 60px;
+  background: #DC0A2D;
+  border-top-left-radius: 120px;
+  border-top-right-radius: 120px;
+  position: absolute;
+  top: 0;
+  border-bottom: 3px solid #333;
+}
+
+.pokeball-bottom {
+  width: 120px;
+  height: 60px;
+  background: white;
+  border-bottom-left-radius: 120px;
+  border-bottom-right-radius: 120px;
+  position: absolute;
+  bottom: 0;
+  border-top: 3px solid #333;
+}
+
+.pokeball-middle {
+  width: 120px;
+  height: 15px;
+  background: #333;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.pokeball-center {
+  width: 35px;
+  height: 35px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 4px solid #333;
+  z-index: 3;
+  box-shadow: inset 0 0 0 4px white, inset 0 0 0 8px #333;
+}
+
 /* Scroll Indicator */
 .scroll-indicator {
   position: absolute;
@@ -978,6 +1062,43 @@ body::before {
   .evolution-item {
     padding: 0.75rem;
   }
+
+  /* Scale down pokeball on tablets */
+  .floating-pokeball {
+    left: 3%;
+  }
+
+  .pokeball {
+    width: 80px;
+    height: 80px;
+  }
+
+  .pokeball-top,
+  .pokeball-bottom {
+    width: 80px;
+    height: 40px;
+  }
+
+  .pokeball-top {
+    border-top-left-radius: 80px;
+    border-top-right-radius: 80px;
+  }
+
+  .pokeball-bottom {
+    border-bottom-left-radius: 80px;
+    border-bottom-right-radius: 80px;
+  }
+
+  .pokeball-middle {
+    width: 80px;
+  }
+
+  .pokeball-center {
+    width: 25px;
+    height: 25px;
+    border: 3px solid #333;
+    box-shadow: inset 0 0 0 3px white, inset 0 0 0 6px #333;
+  }
 }
 
 @media (max-width: 576px) {
@@ -992,6 +1113,11 @@ body::before {
 
   .pokemon-card {
     margin-bottom: 1rem;
+  }
+
+  /* Hide pokeball on small mobile screens */
+  .floating-pokeball {
+    display: none;
   }
 }
 
